@@ -74,9 +74,7 @@ allowance = 0.2;
 
 
 bottomLength = holderRollerLength + (frameThickness + holderBackBottomWidth + 2 * allowance) * 2;
-sideWidth = (holderWidth - gantryWidth) / 2;
-module bottomSide() linear_extrude(sideWidth - allowance)
-    square([frameThickness * 2, bottomLength - holderBackBottomWidth]);
+
 module bottomHole()
     translate([0, bottomLength / 2, holderWidth / 2])
         rotate([0, 90, 0])
@@ -88,10 +86,6 @@ module bottomHole()
             };
 module bottomPart() difference() {
     union() {
-        translate([-frameThickness * 2, holderBackBottomWidth, 0])
-            bottomSide();
-        translate([-frameThickness * 2, holderBackBottomWidth, sideWidth + gantryWidth + allowance])
-            bottomSide();
         translate([-frameThickness, 0, 0]) linear_extrude(holderWidth)
             square([frameThickness, bottomLength]);
     };
@@ -145,19 +139,26 @@ module sidePart() union() {
     extension(holderVerticalSideHolesWidth, -holderVerticalHolesMiddleDistance);
 }
 
-module enforcingTriangle(side)
-    translate([
-        0,
-        frameThickness * 2 + holderBackBottomWidth,
-        holderWidth / 2 + (holderWidth - enforcingTriangleBaseWidth) * side / 2
-    ])
-        rotate([0, 90, 0])
-            linear_extrude(enforcingTriangleVerticalLength, scale=[frameThickness / enforcingTriangleBaseWidth, 0])
-                translate([0, enforcingTriangleHorizontalLength / 2, 0])
-                    square([enforcingTriangleBaseWidth, enforcingTriangleHorizontalLength], center=true);
+module bottomSide(mirrorIndex)
+    translate([-frameThickness, holderBackBottomWidth, holderWidth / 2])
+        mirror([0, 0, mirrorIndex])
+            translate([0, 0, -holderWidth / 2])
+                rotate([0, -90, 0])
+                    linear_extrude(frameThickness / 2, scale=[0.5, 1])
+                        square([frameThickness, holderRollerLength + frameThickness * 2]);
+
+module enforcingTriangle(mirrorIndex)
+    translate([0, frameThickness * 2 + holderBackBottomWidth, holderWidth / 2])
+        mirror([0, 0, mirrorIndex])
+            translate([0, 0, holderWidth / 2])
+                rotate([0, 90, 0])
+                    linear_extrude(enforcingTriangleVerticalLength, scale=[frameThickness / enforcingTriangleBaseWidth, 0])
+                        square([enforcingTriangleBaseWidth, enforcingTriangleHorizontalLength]);
 
 bottomPart();
 sidePart();
+enforcingTriangle(0);
 enforcingTriangle(1);
-enforcingTriangle(-1);
 backPart();
+bottomSide(0);
+bottomSide(1);
