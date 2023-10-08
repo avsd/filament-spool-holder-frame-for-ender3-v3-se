@@ -1,3 +1,2 @@
-#!/bin/bash
-
-openscad-nightly -o spool-holder.stl spool-holder.scad
+#!/usr/bin/env bash
+openscad -o spool-holder.stl spool-holder.scad
