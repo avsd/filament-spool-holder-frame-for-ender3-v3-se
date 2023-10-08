@@ -95,13 +95,20 @@ module bottomPart() difference() {
     }
 };
 
-module backPart() linear_extrude(holderWidth) square([holderMaterialThickness + allowance * 2, frameThickness]);
+module backPart() linear_extrude(holderWidth)
+    polygon([
+        [0, 0],
+        [0, frameThickness + holderBackBottomWidth - holderMaterialThickness],
+        [allowance * 2, frameThickness],
+        [holderMaterialThickness, frameThickness + allowance],
+        [holderMaterialThickness, 0]
+    ]);
 
 
 module extension(width, offset) {
     translate([
         holderVerticalHolesHeight + holderVerticalHolesLength / 2,
-        frameThickness + holderBackBottomWidth,
+        frameThickness + holderBackBottomWidth + allowance * 2,
         holderWidth / 2 + offset
     ])
         rotate([90, 0, 0])
@@ -140,12 +147,12 @@ module sidePart() union() {
 }
 
 module bottomSide(mirrorIndex)
-    translate([-frameThickness, holderBackBottomWidth, holderWidth / 2])
+    translate([-frameThickness, 0, holderWidth / 2])
         mirror([0, 0, mirrorIndex])
             translate([0, 0, -holderWidth / 2])
                 rotate([0, -90, 0])
-                    linear_extrude(frameThickness / 2, scale=[0.5, 1])
-                        square([frameThickness, holderRollerLength + frameThickness * 2]);
+                    linear_extrude(frameThickness / 2, scale=[0.8, 1])
+                        square([(holderWidth - gantryWidth) / 2, bottomLength]);
 
 module enforcingTriangle(mirrorIndex)
     translate([0, frameThickness * 2 + holderBackBottomWidth, holderWidth / 2])
