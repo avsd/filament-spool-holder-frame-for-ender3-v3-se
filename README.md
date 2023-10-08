@@ -4,10 +4,7 @@
 
 Balanced filament spool holder frame for Ender3 V3 SE.
 
-<p align="center">
-    <img src="./photo1.jpg" width="45%" />
-    <img src="./photo2.jpg" width="45%" />
-</p>
+![Photos](./photo.jpg)
 
 The spool is rotated 90º, and moved so that the spool hangs
 above the gantry in the middle of it, making
