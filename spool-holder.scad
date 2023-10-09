@@ -64,10 +64,10 @@ enforcingTriangleHorizontalLength = 30;
 enforcingTriangleBaseWidth = 15;
 
 // Depth of the extension that goes to the middle vertical hole (mm)
-middleExtensionDepth = 5;
+extensionDepth = 5;
 
 // Height of the back stop (mm)
-backStopHeight = 1.6;
+bottomStopHeight = 1.6;
 
 // Thickness of the part where screw goes (mm)
 screwHoleThickness = 1.6;
@@ -103,8 +103,8 @@ module backPart() linear_extrude(holderWidth)
         [0, 0],
         [0, frameThickness + holderBackBottomWidth - holderMaterialThickness],
         [allowance * 2, frameThickness],
-        [backStopHeight, frameThickness + allowance],
-        [backStopHeight, 0]
+        [bottomStopHeight, frameThickness + allowance],
+        [bottomStopHeight, 0]
     ]);
 
 
@@ -116,7 +116,7 @@ module extension(width, offset) {
     ])
         rotate([90, 0, 0])
             intersection() {
-                linear_extrude(middleExtensionDepth, scale=[1, 0.5])
+                linear_extrude(extensionDepth, scale=[1, 0.5])
                     hull() {
                         translate([-(holderVerticalHolesLength - width) / 2, 0, 0])
                             circle(width / 2 - allowance, $fn=50);
@@ -124,8 +124,8 @@ module extension(width, offset) {
                             circle(width / 2 - allowance, $fn=50);
                     }
                 linear_extrude(
-                    middleExtensionDepth,
-                    scale=[1 - middleExtensionDepth / holderVerticalHolesLength, 1]
+                    extensionDepth,
+                    scale=[1 - extensionDepth / holderVerticalHolesLength, 1]
                 )
                     hull() {
                         translate([-(holderVerticalHolesLength) / 2, 0, 0])
