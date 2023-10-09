@@ -66,6 +66,9 @@ enforcingTriangleBaseWidth = 15;
 // Depth of the extension that goes to the middle vertical hole (mm)
 middleExtensionDepth = 5;
 
+// Height of the back stop (mm)
+backStopHeight = 1.6;
+
 // Thickness of the part where screw goes (mm)
 screwHoleThickness = 1.6;
 
@@ -100,8 +103,8 @@ module backPart() linear_extrude(holderWidth)
         [0, 0],
         [0, frameThickness + holderBackBottomWidth - holderMaterialThickness],
         [allowance * 2, frameThickness],
-        [holderMaterialThickness, frameThickness + allowance],
-        [holderMaterialThickness, 0]
+        [backStopHeight, frameThickness + allowance],
+        [backStopHeight, 0]
     ]);
 
 
