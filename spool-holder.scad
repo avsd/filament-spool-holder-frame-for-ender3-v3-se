@@ -72,11 +72,16 @@ bottomStopHeight = 1.6;
 // Thickness of the part where screw goes (mm)
 screwHoleThickness = 1.6;
 
+// Length of the pins to go into the original holder holes
+pinLength = 6;
+
 // Allowance for fitting (mm, from ech side!)
 allowance = 0.2;
 
 
 bottomLength = holderRollerLength + (frameThickness + holderBackBottomWidth + 2 * allowance) * 2;
+onlyPins = false;
+withPins = false;
 
 module bottomHole()
     translate([0, bottomLength / 2, holderWidth / 2])
@@ -165,10 +170,50 @@ module enforcingTriangle(mirrorIndex)
                     linear_extrude(enforcingTriangleVerticalLength, scale=[frameThickness / enforcingTriangleBaseWidth, 0])
                         square([enforcingTriangleBaseWidth, enforcingTriangleHorizontalLength]);
 
-bottomPart();
-sidePart();
-enforcingTriangle(0);
-enforcingTriangle(1);
-backPart();
-bottomSide(0);
-bottomSide(1);
+module pins(slots=false) translate([
+    0,
+    frameThickness + holderBackBottomWidth / 2 + allowance,
+    holderWidth / 2,
+]) rotate([0, 90, 0])
+    for(m = [0, 1]) mirror([m, 0, 0]) translate([holderScrewHolesDistance / 2, 0, -frameThickness - allowance]) {
+        if (slots) {
+            linear_extrude(frameThickness * 5) circle(holderScrewHolesDiameter / 2 + allowance, $fn=50);
+            linear_extrude(frameThickness - screwHoleThickness + allowance) hull() {
+                circle(holderScrewHolesDiameter / 2 + allowance, $fn=50);
+                translate([-holderScrewHolesDistance / 2, 0, 0])
+                    square(holderScrewHolesDiameter + allowance * 2, center=true);
+            }
+        } else {
+            hull() {
+                linear_extrude(frameThickness + pinLength) circle(holderScrewHolesDiameter / 3, $fn=50);
+                linear_extrude(frameThickness + pinLength - holderScrewHolesDiameter / 3)
+                    circle(holderScrewHolesDiameter / 2, $fn=50);
+            }
+            linear_extrude(frameThickness - screwHoleThickness) hull() {
+                circle(holderScrewHolesDiameter / 2, $fn=50);
+                translate([-holderScrewHolesDistance / 2, 0, 0])
+                    square(holderScrewHolesDiameter, center=true);
+            }
+        }
+    }
+    
+
+module holderWithoutPins() {
+    bottomPart();
+    sidePart();
+    enforcingTriangle(0);
+    enforcingTriangle(1);
+    backPart();
+    bottomSide(0);
+    bottomSide(1);
+};
+
+module holderWithPins() difference() { holderWithoutPins(); pins(slots=true); };
+
+if (onlyPins) {
+    rotate([90, 0, 0]) pins();
+} else if (withPins) {
+    holderWithPins();
+} else {
+    holderWithoutPins();
+}
