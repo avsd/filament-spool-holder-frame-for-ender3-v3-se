@@ -51,6 +51,9 @@ holderVerticalHolesMiddleDistance = holderVerticalHolesDistance + (
 // Length of the active part of the holder roller (mm)
 holderRollerLength = 98;
 
+// Additional elevation of the holder (to hold non-standard spools with larger diameter)
+elevation = 0;
+
 // Thickness of all parts of the new holder frame (mm)
 frameThickness = 5;
 
@@ -81,7 +84,7 @@ allowance = 0.2;
 
 bottomLength = holderRollerLength + (frameThickness + holderBackBottomWidth + 2 * allowance) * 2;
 onlyPins = false;
-withPins = false;
+withPins = true;
 
 module bottomHole()
     translate([0, bottomLength / 2, holderWidth / 2])
@@ -96,6 +99,7 @@ module bottomPart() difference() {
     union() {
         translate([-frameThickness, 0, 0]) linear_extrude(holderWidth)
             square([frameThickness, bottomLength]);
+        if (elevation > 0) linear_extrude(holderWidth) square([elevation, frameThickness * 2 + holderBackBottomWidth]);
     };
     union() {
         translate([-frameThickness * 2, -holderScrewHolesDistance / 2, 0]) bottomHole();
@@ -103,7 +107,7 @@ module bottomPart() difference() {
     }
 };
 
-module backPart() linear_extrude(holderWidth)
+module backPart() translate([elevation, 0, 0]) linear_extrude(holderWidth)
     polygon([
         [0, 0],
         [0, frameThickness + holderBackBottomWidth - holderMaterialThickness],
@@ -115,7 +119,7 @@ module backPart() linear_extrude(holderWidth)
 
 module extension(width, offset) {
     translate([
-        holderVerticalHolesHeight + holderVerticalHolesLength / 2,
+        elevation + holderVerticalHolesHeight + holderVerticalHolesLength / 2,
         frameThickness + holderBackBottomWidth + allowance * 2,
         holderWidth / 2 + offset
     ])
@@ -146,7 +150,10 @@ module sidePart() union() {
     // frame
     translate([0, frameThickness + holderBackBottomWidth + 2 * allowance, 0])
         linear_extrude(holderWidth)
-            square([holderVerticalHolesLength + holderVerticalHolesHeight + frameThickness, frameThickness]);
+            square([
+                elevation + holderVerticalHolesLength + holderVerticalHolesHeight + frameThickness,
+                frameThickness
+            ]);
 
     // extensions
     extension(holderVerticalMiddleHoleWidth, 0);
@@ -177,7 +184,7 @@ module pins(slots=false) translate([
 ]) rotate([0, 90, 0])
     for(m = [0, 1]) mirror([m, 0, 0]) translate([holderScrewHolesDistance / 2, 0, -frameThickness - allowance]) {
         if (slots) {
-            linear_extrude(frameThickness * 5) circle(holderScrewHolesDiameter / 2 + allowance, $fn=50);
+            linear_extrude(elevation + frameThickness * 5) circle(holderScrewHolesDiameter / 2 + allowance, $fn=50);
             linear_extrude(frameThickness - screwHoleThickness + allowance) hull() {
                 circle(holderScrewHolesDiameter / 2 + allowance, $fn=50);
                 translate([-holderScrewHolesDistance / 2, 0, 0])
@@ -185,8 +192,8 @@ module pins(slots=false) translate([
             }
         } else {
             hull() {
-                linear_extrude(frameThickness + pinLength) circle(holderScrewHolesDiameter / 3, $fn=50);
-                linear_extrude(frameThickness + pinLength - holderScrewHolesDiameter / 3)
+                linear_extrude(elevation + frameThickness + pinLength) circle(holderScrewHolesDiameter / 3, $fn=50);
+                linear_extrude(elevation + frameThickness + pinLength - holderScrewHolesDiameter / 3)
                     circle(holderScrewHolesDiameter / 2, $fn=50);
             }
             linear_extrude(frameThickness - screwHoleThickness) hull() {
